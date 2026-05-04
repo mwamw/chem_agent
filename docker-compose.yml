@@ -11,11 +11,21 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chemintel -d chemintel"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   redis:
     image: redis:7
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   minio:
     image: minio/minio:latest
@@ -33,28 +43,45 @@ services:
     build: .
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     env_file:
-      - .env.example
+      - .env
     volumes:
       - .:/workspace
     working_dir: /workspace
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
-      - redis
-      - minio
+      migrator:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+      minio:
+        condition: service_started
+
+  migrator:
+    build: .
+    command: alembic upgrade head
+    env_file:
+      - .env
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   worker:
     build: .
     command: celery -A app.workers.celery_app.celery_app worker --loglevel=info
     env_file:
-      - .env.example
+      - .env
     volumes:
       - .:/workspace
     working_dir: /workspace
     depends_on:
-      - postgres
-      - redis
+      migrator:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
 
 volumes:
   postgres_data:

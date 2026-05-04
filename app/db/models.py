@@ -15,7 +15,9 @@ def _id(prefix: str) -> str:
 
 class TimestampMixin:
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
 
 class Tenant(Base, TimestampMixin):
@@ -31,8 +33,11 @@ class User(Base, TimestampMixin):
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=lambda: _id("user"))
     tenant_id: Mapped[str] = mapped_column(ForeignKey("tenants.id"))
     username: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    email: Mapped[str | None] = mapped_column(String(255), unique=True, index=True, nullable=True)
+    password_hash: Mapped[str | None] = mapped_column(Text, nullable=True)
     display_name: Mapped[str] = mapped_column(String(120))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     tenant: Mapped["Tenant"] = relationship()
 
 
@@ -58,6 +63,19 @@ class Permission(Base, TimestampMixin):
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=lambda: _id("perm"))
     role_id: Mapped[str] = mapped_column(ForeignKey("roles.id"))
     key: Mapped[str] = mapped_column(String(120))
+
+
+class RefreshToken(Base, TimestampMixin):
+    __tablename__ = "refresh_tokens"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=lambda: _id("rtok"))
+    tenant_id: Mapped[str] = mapped_column(String(32), index=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    token_hash: Mapped[str] = mapped_column(String(128), unique=True, index=True)
+    jwt_id: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    replaced_by_token_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
 
 class Compound(Base, TimestampMixin):
@@ -146,7 +164,42 @@ class PaperChunk(Base, TimestampMixin):
     chunk_index: Mapped[int] = mapped_column(Integer)
     section_title: Mapped[str] = mapped_column(String(255), default="abstract")
     content: Mapped[str] = mapped_column(Text)
+    embedding: Mapped[str | None] = mapped_column(Text, nullable=True)
+    embedding_model: Mapped[str | None] = mapped_column(String(120), nullable=True)
     metadata_json: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class ToolPolicy(Base, TimestampMixin):
+    __tablename__ = "tools"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=lambda: _id("toolpol"))
+    name: Mapped[str] = mapped_column(String(120), unique=True, index=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    permission_key: Mapped[str] = mapped_column(String(120), index=True)
+    timeout_seconds: Mapped[int] = mapped_column(Integer, default=15)
+    requires_approval: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_side_effect: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class AgentTool(Base, TimestampMixin):
+    __tablename__ = "agent_tools"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=lambda: _id("atool"))
+    tenant_id: Mapped[str] = mapped_column(String(32), index=True)
+    agent_id: Mapped[str] = mapped_column(String(64), index=True)
+    tool_name: Mapped[str] = mapped_column(String(120), index=True)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class ToolPermission(Base, TimestampMixin):
+    __tablename__ = "tool_permissions"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=lambda: _id("tperm"))
+    role_id: Mapped[str] = mapped_column(ForeignKey("roles.id"), index=True)
+    tool_name: Mapped[str] = mapped_column(String(120), index=True)
+    can_execute: Mapped[bool] = mapped_column(Boolean, default=True)
+    requires_approval: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class Agent(Base, TimestampMixin):
@@ -170,6 +223,9 @@ class AgentRun(Base, TimestampMixin):
     input_text: Mapped[str] = mapped_column(Text)
     final_answer: Mapped[str] = mapped_column(Text, default="")
     status: Mapped[str] = mapped_column(String(32), default="completed")
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     citations_json: Mapped[list] = mapped_column(JSON, default=list)
     actions_json: Mapped[list] = mapped_column(JSON, default=list)
 
@@ -186,6 +242,10 @@ class AgentStep(Base, TimestampMixin):
     tool_input: Mapped[dict] = mapped_column(JSON, default=dict)
     tool_output: Mapped[dict] = mapped_column(JSON, default=dict)
     status: Mapped[str] = mapped_column(String(32), default="success")
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
 class ToolInvocation(Base, TimestampMixin):
@@ -199,6 +259,9 @@ class ToolInvocation(Base, TimestampMixin):
     output_json: Mapped[dict] = mapped_column(JSON, default=dict)
     status: Mapped[str] = mapped_column(String(32), default="success")
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
 
 class AuditLog(Base, TimestampMixin):

@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Awaitable, Callable
 
+from pydantic import BaseModel
+
 
 @dataclass
 class ToolContext:
@@ -10,6 +12,7 @@ class ToolContext:
     user_id: str
     run_id: str | None
     services: dict[str, Any]
+    permissions: frozenset[str] = field(default_factory=frozenset)
 
 
 @dataclass
@@ -29,3 +32,5 @@ class ToolDefinition:
     description: str
     permission_key: str
     handler: ToolHandler
+    input_model: type[BaseModel] | None = None
+    timeout_seconds: int = 15

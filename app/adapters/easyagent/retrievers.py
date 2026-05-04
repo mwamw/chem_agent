@@ -6,7 +6,6 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import Any
 
-
 TOKEN_RE = re.compile(r"[A-Za-z0-9\-\+]+")
 STOPWORDS = {
     "a",
@@ -60,7 +59,9 @@ def _tokenize(text: str) -> list[str]:
     return lowered.split()
 
 
-def _tfidf_score(query_tokens: list[str], doc_tokens: list[str], document_frequency: Counter, total_docs: int) -> float:
+def _tfidf_score(
+    query_tokens: list[str], doc_tokens: list[str], document_frequency: Counter, total_docs: int
+) -> float:
     if not query_tokens or not doc_tokens:
         return 0.0
     doc_counter = Counter(doc_tokens)
@@ -143,7 +144,9 @@ class HybridRetriever:
         self.llm = llm
         self.multi_query_count = multi_query_count
 
-    def retrieve(self, query: str, chunks: list[dict[str, Any]], k: int = 4, profile: str = "balanced") -> list[RetrievedChunk]:
+    def retrieve(
+        self, query: str, chunks: list[dict[str, Any]], k: int = 4, profile: str = "balanced"
+    ) -> list[RetrievedChunk]:
         expanded_queries = [query]
         if profile in {"high_recall", "multi_query"}:
             expanded_queries = self._expand_queries(query)
@@ -159,7 +162,9 @@ class HybridRetriever:
             merged = self._rerank(query, merged, top_k=k)
         return merged[:k]
 
-    def _retrieve_once(self, query: str, chunks: list[dict[str, Any]], k: int) -> list[RetrievedChunk]:
+    def _retrieve_once(
+        self, query: str, chunks: list[dict[str, Any]], k: int
+    ) -> list[RetrievedChunk]:
         docs_tokens = [_tokenize(chunk["content"]) for chunk in chunks]
         title_tokens_list = [_tokenize(chunk["paper_title"]) for chunk in chunks]
         document_frequency: Counter = Counter()
@@ -172,7 +177,9 @@ class HybridRetriever:
         ranked: list[RetrievedChunk] = []
         for raw, doc_tokens, title_tokens in zip(chunks, docs_tokens, title_tokens_list):
             bm25_like = _tfidf_score(query_tokens, doc_tokens, document_frequency, len(chunks))
-            title_bm25 = _tfidf_score(query_tokens, title_tokens, title_document_frequency, len(chunks))
+            title_bm25 = _tfidf_score(
+                query_tokens, title_tokens, title_document_frequency, len(chunks)
+            )
             dense_like = _dense_overlap(query_tokens, doc_tokens)
             title_dense = _dense_overlap(query_tokens, title_tokens)
             heuristic = _heuristic_boost(query, raw["paper_title"], raw["content"])
@@ -207,12 +214,16 @@ class HybridRetriever:
         )
         try:
             response = self.llm.invoke([{"role": "user", "content": prompt}])
-            generated = [line.strip(" -0123456789.") for line in str(response).splitlines() if line.strip()]
+            generated = [
+                line.strip(" -0123456789.") for line in str(response).splitlines() if line.strip()
+            ]
             return [query] + generated[: self.multi_query_count]
         except Exception:
             return [query]
 
-    def _rerank(self, query: str, candidates: list[RetrievedChunk], top_k: int) -> list[RetrievedChunk]:
+    def _rerank(
+        self, query: str, candidates: list[RetrievedChunk], top_k: int
+    ) -> list[RetrievedChunk]:
         if not candidates:
             return []
         heuristic_scores = {
@@ -232,7 +243,9 @@ class HybridRetriever:
             "Chunks:",
         ]
         for item in candidates[: max(top_k * 2, 6)]:
-            prompt_lines.append(f"- chunk_id={item.chunk_id}; title={item.paper_title}; text={item.content[:400]}")
+            prompt_lines.append(
+                f"- chunk_id={item.chunk_id}; title={item.paper_title}; text={item.content[:400]}"
+            )
         try:
             response = str(self.llm.invoke([{"role": "user", "content": "\n".join(prompt_lines)}]))
             scores = {}
@@ -243,7 +256,8 @@ class HybridRetriever:
             reranked = sorted(
                 candidates,
                 key=lambda item: (
-                    scores.get(item.chunk_id, 0.0) + heuristic_scores.get(item.chunk_id, item.score),
+                    scores.get(item.chunk_id, 0.0)
+                    + heuristic_scores.get(item.chunk_id, item.score),
                     item.score,
                 ),
                 reverse=True,

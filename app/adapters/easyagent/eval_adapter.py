@@ -28,8 +28,17 @@ class EvalRunner:
         async with SessionFactory() as session:
             service = AgentRunService(session)
             for case in cases:
-                run = await service.run(case["agent_id"], tenant_id, user_id, case["query"])
-                ok = all(fragment.lower() in run.final_answer.lower() for fragment in case.get("expected_contains", []))
+                run = await service.run(
+                    case["agent_id"],
+                    tenant_id,
+                    user_id,
+                    case["query"],
+                    frozenset({"*"}),
+                )
+                ok = all(
+                    fragment.lower() in run.final_answer.lower()
+                    for fragment in case.get("expected_contains", [])
+                )
                 results.append(
                     {
                         "case_id": case["case_id"],
@@ -51,7 +60,9 @@ class EvalRunner:
             "results": results,
         }
 
-    async def run_rag_suite(self, suite_path: str, tenant_id: str, k: int = 3, profile: str = "high_recall") -> dict:
+    async def run_rag_suite(
+        self, suite_path: str, tenant_id: str, k: int = 3, profile: str = "high_recall"
+    ) -> dict:
         cases = json.loads(Path(suite_path).read_text(encoding="utf-8"))
         results = []
         latencies_ms: list[float] = []
@@ -72,7 +83,9 @@ class EvalRunner:
                         break
                 hit_at_1 = 1 if any(paper_id in expected_ids for paper_id in paper_ids[:1]) else 0
                 hit_at_k = 1 if any(paper_id in expected_ids for paper_id in paper_ids[:k]) else 0
-                precision_at_k = sum(1 for paper_id in paper_ids[:k] if paper_id in expected_ids) / max(min(k, len(paper_ids)), 1)
+                precision_at_k = sum(
+                    1 for paper_id in paper_ids[:k] if paper_id in expected_ids
+                ) / max(min(k, len(paper_ids)), 1)
                 precision_at_1 = 1.0 if paper_ids and paper_ids[0] in expected_ids else 0.0
                 results.append(
                     {
@@ -97,8 +110,12 @@ class EvalRunner:
                 "hit_at_1": round(mean(row["hit_at_1"] for row in results), 4),
                 "hit_at_k": round(mean(row["hit_at_k"] for row in results), 4),
                 "mrr": round(mean(row["reciprocal_rank"] for row in results), 4),
-                "citation_precision_at_1": round(mean(row["citation_precision_at_1"] for row in results), 4),
-                "citation_precision_at_k": round(mean(row["citation_precision_at_k"] for row in results), 4),
+                "citation_precision_at_1": round(
+                    mean(row["citation_precision_at_1"] for row in results), 4
+                ),
+                "citation_precision_at_k": round(
+                    mean(row["citation_precision_at_k"] for row in results), 4
+                ),
                 "avg_latency_ms": round(mean(latencies_ms), 2),
                 "p95_latency_ms": round(sorted_latencies[p95_index], 2),
                 "profile": profile,
@@ -137,6 +154,7 @@ def main() -> None:
             )
         )
     else:
+
         async def run_all() -> dict[str, object]:
             return {
                 "agent": await runner.run_agent_suite(

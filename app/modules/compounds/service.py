@@ -12,11 +12,15 @@ class CompoundService:
         self.session = session
 
     async def resolve(self, tenant_id: str, query: str) -> Compound:
-        synonym_subquery = select(CompoundSynonym.compound_id).where(CompoundSynonym.synonym.ilike(f"%{query}%"))
+        synonym_subquery = select(CompoundSynonym.compound_id).where(
+            CompoundSynonym.synonym.ilike(f"%{query}%")
+        )
         result = await self.session.execute(
             select(Compound)
             .where(Compound.tenant_id == tenant_id)
-            .where(or_(Compound.primary_name.ilike(f"%{query}%"), Compound.id.in_(synonym_subquery)))
+            .where(
+                or_(Compound.primary_name.ilike(f"%{query}%"), Compound.id.in_(synonym_subquery))
+            )
             .order_by(Compound.primary_name.asc())
         )
         compound = result.scalars().first()
@@ -35,6 +39,8 @@ class CompoundService:
 
     async def get_synonyms(self, compound_id: str) -> list[str]:
         result = await self.session.execute(
-            select(CompoundSynonym.synonym).where(CompoundSynonym.compound_id == compound_id).order_by(CompoundSynonym.synonym.asc())
+            select(CompoundSynonym.synonym)
+            .where(CompoundSynonym.compound_id == compound_id)
+            .order_by(CompoundSynonym.synonym.asc())
         )
         return list(result.scalars().all())

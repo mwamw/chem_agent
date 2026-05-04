@@ -10,7 +10,9 @@ class BioactivityService:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def search(self, tenant_id: str, target_query: str | None, compound_query: str | None, limit: int = 10) -> list[dict]:
+    async def search(
+        self, tenant_id: str, target_query: str | None, compound_query: str | None, limit: int = 10
+    ) -> list[dict]:
         stmt = (
             select(Bioactivity, Compound, Target)
             .join(Compound, Compound.id == Bioactivity.compound_id)

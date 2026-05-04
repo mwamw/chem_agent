@@ -40,7 +40,12 @@ class RAGService:
                 answer = self._fallback_answer(query, citations)
         else:
             answer = self._fallback_answer(query, citations)
-        return {"answer": answer, "citations": citations, "profile": profile}
+        return {
+            "answer": answer,
+            "citations": citations,
+            "profile": profile,
+            "retrieval_mode": retrieval.get("retrieval_mode", "unknown"),
+        }
 
     @staticmethod
     def _fallback_answer(query: str, citations: list[dict]) -> str:

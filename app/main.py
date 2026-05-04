@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import get_settings
+from app.core.config import get_settings, validate_runtime_settings
 from app.core.logging import configure_logging
 from app.db.session import init_db
 from app.modules.activities.router import router as bioactivity_router
@@ -17,8 +17,8 @@ from app.modules.literature.router import router as literature_router
 from app.modules.rag.router import router as rag_router
 from app.modules.targets.router import router as target_router
 
-
 settings = get_settings()
+validate_runtime_settings(settings)
 configure_logging()
 
 
@@ -51,3 +51,13 @@ app.include_router(audit_router, prefix=api_prefix)
 @app.get("/")
 async def root() -> dict:
     return {"name": settings.project_name, "status": "ok"}
+
+
+@app.get("/health/live")
+async def liveness() -> dict:
+    return {"status": "ok"}
+
+
+@app.get("/health/ready")
+async def readiness() -> dict:
+    return {"status": "ok", "database": "configured"}

@@ -33,7 +33,9 @@ class ReportService:
         parts: list[str] = [f"Brief for: {prompt}"]
         compound = context.get("compound")
         if isinstance(compound, dict) and compound.get("primary_name"):
-            parts.append(f"Compound: {compound['primary_name']}. {compound.get('summary', '')}".strip())
+            parts.append(
+                f"Compound: {compound['primary_name']}. {compound.get('summary', '')}".strip()
+            )
         target = context.get("target")
         if isinstance(target, dict) and target.get("symbol"):
             parts.append(f"Target: {target['symbol']}. {target.get('summary', '')}".strip())

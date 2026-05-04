@@ -9,6 +9,5 @@ if str(ROOT) not in sys.path:
 
 from app.adapters.easyagent.eval_adapter import main
 
-
 if __name__ == "__main__":
     main()
