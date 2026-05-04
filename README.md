@@ -164,7 +164,7 @@ Authorization: Bearer <access_token>
 查看当前用户：
 
 ```bash
-curl -s http://127.0.0.1:8000/api/v1/auth/me \
+curl -s http://127.0.0.1:8011/api/v1/auth/me \
   -H "authorization: Bearer <access_token>"
 ```
 
@@ -437,7 +437,7 @@ curl -s -X POST http://127.0.0.1:8000/api/v1/rag/query \
 ### Compound Research Agent
 
 ```bash
-curl -s -X POST http://127.0.0.1:8000/api/v1/agents/compound_research_agent/runs \
+curl -s -X POST http://127.0.0.1:8011/api/v1/agents/compound_research_agent/runs \
   -H "content-type: application/json" \
   -H "authorization: Bearer <access_token>" \
   -d '{

@@ -26,6 +26,7 @@ dependencies = [
   "python-jose[cryptography]>=3.3.0",
   "argon2-cffi>=23.1.0",
   "boto3>=1.34.0",
+  "pgvector>=0.2.0",
 ]
 
 [project.optional-dependencies]

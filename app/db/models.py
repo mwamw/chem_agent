@@ -5,6 +5,7 @@ from uuid import uuid4
 
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from pgvector.sqlalchemy import Vector
 
 from app.db.base import Base
 
@@ -164,7 +165,7 @@ class PaperChunk(Base, TimestampMixin):
     chunk_index: Mapped[int] = mapped_column(Integer)
     section_title: Mapped[str] = mapped_column(String(255), default="abstract")
     content: Mapped[str] = mapped_column(Text)
-    embedding: Mapped[str | None] = mapped_column(Text, nullable=True)
+    embedding: Mapped[list[float] | None] = mapped_column(Vector(384), nullable=True)
     embedding_model: Mapped[str | None] = mapped_column(String(120), nullable=True)
     metadata_json: Mapped[dict] = mapped_column(JSON, default=dict)
 
