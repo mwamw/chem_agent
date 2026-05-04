@@ -1,0 +1,38 @@
+[
+  {
+    "case_id": "compound_gefitinib",
+    "agent_id": "compound_research_agent",
+    "query": "Give me a short research brief on Gefitinib and cite evidence.",
+    "expected_contains": ["Gefitinib"]
+  },
+  {
+    "case_id": "target_egfr",
+    "agent_id": "target_intel_agent",
+    "query": "Summarize EGFR inhibitor evidence and relevant compounds.",
+    "expected_contains": ["EGFR"]
+  },
+  {
+    "case_id": "literature_parp",
+    "agent_id": "literature_brief_agent",
+    "query": "Summarize PARP inhibitor literature evidence.",
+    "expected_contains": ["PARP"]
+  },
+  {
+    "case_id": "compound_olaparib",
+    "agent_id": "compound_research_agent",
+    "query": "Give me a short research brief on Olaparib and cite evidence.",
+    "expected_contains": ["Olaparib"]
+  },
+  {
+    "case_id": "target_parp1",
+    "agent_id": "target_intel_agent",
+    "query": "Summarize PARP1 inhibitor evidence and relevant compounds.",
+    "expected_contains": ["PARP1"]
+  },
+  {
+    "case_id": "literature_egfr",
+    "agent_id": "literature_brief_agent",
+    "query": "Summarize EGFR inhibitor resistance literature evidence.",
+    "expected_contains": ["EGFR"]
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "case_id": "rag_gefitinib_profile",
+    "query": "Gefitinib first-generation EGFR inhibitor targeted therapy",
+    "expected_paper_ids": ["pap_gefitinib_profile"]
+  },
+  {
+    "case_id": "rag_egfr_resistance",
+    "query": "EGFR inhibitor resistance mechanisms",
+    "expected_paper_ids": ["pap_egfr_review"]
+  },
+  {
+    "case_id": "rag_t790m_resistance",
+    "query": "T790M-mediated resistance in EGFR-driven disease",
+    "expected_paper_ids": ["pap_egfr_review"]
+  },
+  {
+    "case_id": "rag_parp_synthetic_lethality",
+    "query": "PARP inhibitor synthetic lethality oncology",
+    "expected_paper_ids": ["pap_parp_brief"]
+  },
+  {
+    "case_id": "rag_olaparib_reference",
+    "query": "Olaparib clinically important PARP inhibitor",
+    "expected_paper_ids": ["pap_parp_brief"]
+  },
+  {
+    "case_id": "rag_gefitinib_oral_tki",
+    "query": "orally available gefitinib EGFR tyrosine kinase inhibitor",
+    "expected_paper_ids": ["pap_gefitinib_profile"]
+  },
+  {
+    "case_id": "rag_gefitinib_reference_therapy",
+    "query": "reference first-generation EGFR-targeted therapy gefitinib",
+    "expected_paper_ids": ["pap_gefitinib_profile"]
+  },
+  {
+    "case_id": "rag_egfr_bypass_signaling",
+    "query": "EGFR resistance bypass signaling histologic transformation",
+    "expected_paper_ids": ["pap_egfr_review"]
+  },
+  {
+    "case_id": "rag_osimertinib_t790m",
+    "query": "osimertinib developed to address T790M mediated resistance",
+    "expected_paper_ids": ["pap_egfr_review"]
+  },
+  {
+    "case_id": "rag_parp_precision_oncology",
+    "query": "PARP inhibitors precision oncology workflows DNA repair weakness",
+    "expected_paper_ids": ["pap_parp_brief"]
+  },
+  {
+    "case_id": "rag_synthetic_lethality_practice",
+    "query": "synthetic lethality translated into oncology practice olaparib",
+    "expected_paper_ids": ["pap_parp_brief"]
+  }
+]

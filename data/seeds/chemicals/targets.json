@@ -1,0 +1,16 @@
+[
+  {
+    "id": "tgt_egfr",
+    "symbol": "EGFR",
+    "full_name": "epidermal growth factor receptor",
+    "organism": "Homo sapiens",
+    "summary": "A receptor tyrosine kinase frequently targeted in non-small cell lung cancer."
+  },
+  {
+    "id": "tgt_parp1",
+    "symbol": "PARP1",
+    "full_name": "poly(ADP-ribose) polymerase 1",
+    "organism": "Homo sapiens",
+    "summary": "A DNA repair protein and a major target class in synthetic lethality oncology programs."
+  }
+]

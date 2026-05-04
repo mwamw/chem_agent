@@ -1,0 +1,1 @@
+"""Compound domain package."""

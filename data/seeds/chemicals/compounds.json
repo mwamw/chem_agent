@@ -1,0 +1,44 @@
+[
+  {
+    "id": "cmp_gefitinib",
+    "primary_name": "Gefitinib",
+    "smiles": "COC1=C(C=C2C(=C1)N=CN=C2NC3=CC=CC=C3Cl)OCCCN4CCOCC4",
+    "inchi": "InChI=1S/C22H24ClFN4O3/c1-30-19-12-16-18(13-20(19)31-2)27-14-26-21(16)25-15-4-3-5-17(23)11-15/h3-5,11-14H,6-10H2,1-2H3,(H,25,26,27)",
+    "molecular_formula": "C22H24ClFN4O3",
+    "molecular_weight": 446.9,
+    "summary": "A first-generation EGFR tyrosine kinase inhibitor used as a targeted therapy reference compound.",
+    "properties_json": {
+      "mechanism": "EGFR inhibitor",
+      "approval_status": "marketed"
+    },
+    "synonyms": ["Iressa", "ZD1839"]
+  },
+  {
+    "id": "cmp_osimertinib",
+    "primary_name": "Osimertinib",
+    "smiles": "COC1=C(NC2=NC=C(C=N2)N(C)C)C=C(C=C1)NC(=O)C=C",
+    "inchi": "InChI=1S/C28H33N7O2/c1-18-27(36)35-22-10-8-21(17-24(22)37-4)33-26-31-14-20(16-30-26)34(5)23-11-9-19(15-32-23)29-25-12-13-28(2,3)6-7-25/h8-18,25,29H,6-7,30H2,1-5H3,(H,31,33,35,36)",
+    "molecular_formula": "C28H33N7O2",
+    "molecular_weight": 499.6,
+    "summary": "A third-generation EGFR inhibitor active against T790M resistance mutations.",
+    "properties_json": {
+      "mechanism": "EGFR T790M inhibitor",
+      "approval_status": "marketed"
+    },
+    "synonyms": ["Tagrisso", "AZD9291"]
+  },
+  {
+    "id": "cmp_olaparib",
+    "primary_name": "Olaparib",
+    "smiles": "CC1(C2=C(C=CC=C2)C(=O)N(C1=O)C3=NN=C(N3)N)C",
+    "inchi": "InChI=1S/C24H23FN4O3/c1-24(2)19-10-6-8-16(13-19)22(30)29(23(24)31)17-9-7-15(14-18(17)32-3)26-20-11-12-28-21(27-20)25/h6-14H,1-5H3,(H,26,27,28)",
+    "molecular_formula": "C24H23FN4O3",
+    "molecular_weight": 434.5,
+    "summary": "A PARP inhibitor commonly used in synthetic lethality and DNA repair pathway discussions.",
+    "properties_json": {
+      "mechanism": "PARP inhibitor",
+      "approval_status": "marketed"
+    },
+    "synonyms": ["Lynparza", "AZD2281"]
+  }
+]

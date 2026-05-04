@@ -1,0 +1,29 @@
+[
+  {
+    "id": "bio_gefitinib_egfr",
+    "compound_id": "cmp_gefitinib",
+    "target_id": "tgt_egfr",
+    "activity_type": "IC50",
+    "activity_value": 33.0,
+    "activity_unit": "nM",
+    "evidence_summary": "Representative EGFR inhibitory potency in biochemical assays."
+  },
+  {
+    "id": "bio_osimertinib_egfr",
+    "compound_id": "cmp_osimertinib",
+    "target_id": "tgt_egfr",
+    "activity_type": "IC50",
+    "activity_value": 12.0,
+    "activity_unit": "nM",
+    "evidence_summary": "Representative potency against mutant EGFR including resistance settings."
+  },
+  {
+    "id": "bio_olaparib_parp1",
+    "compound_id": "cmp_olaparib",
+    "target_id": "tgt_parp1",
+    "activity_type": "IC50",
+    "activity_value": 5.0,
+    "activity_unit": "nM",
+    "evidence_summary": "Representative PARP1 inhibitory potency for approved oncology use."
+  }
+]

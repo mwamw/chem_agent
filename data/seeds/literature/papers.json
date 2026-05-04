@@ -1,0 +1,51 @@
+[
+  {
+    "id": "pap_egfr_review",
+    "title": "EGFR inhibitor resistance mechanisms in non-small cell lung cancer",
+    "abstract": "EGFR inhibitor resistance involves secondary mutations, bypass signaling, and histologic transformation.",
+    "doi": "10.1000/egfr-review",
+    "pmid": "10000001",
+    "pmcid": "PMC1000001",
+    "source_url": "https://example.org/egfr-review",
+    "chunks": [
+      {
+        "section_title": "abstract",
+        "content": "Acquired resistance to EGFR inhibitors often includes secondary EGFR mutations such as T790M, bypass pathway activation, and phenotypic transformation."
+      },
+      {
+        "section_title": "discussion",
+        "content": "Third-generation inhibitors such as osimertinib were developed to address T790M-mediated resistance while maintaining activity in EGFR-driven disease."
+      }
+    ]
+  },
+  {
+    "id": "pap_gefitinib_profile",
+    "title": "Clinical and pharmacologic profile of gefitinib",
+    "abstract": "Gefitinib is a first-generation EGFR inhibitor with established targeted therapy use.",
+    "doi": "10.1000/gefitinib-profile",
+    "pmid": "10000002",
+    "pmcid": "PMC1000002",
+    "source_url": "https://example.org/gefitinib-profile",
+    "chunks": [
+      {
+        "section_title": "abstract",
+        "content": "Gefitinib is an orally available EGFR tyrosine kinase inhibitor used as a reference first-generation EGFR-targeted therapy."
+      }
+    ]
+  },
+  {
+    "id": "pap_parp_brief",
+    "title": "PARP inhibition and synthetic lethality in DNA repair deficient tumors",
+    "abstract": "PARP inhibitors exploit DNA repair weakness and support precision oncology workflows.",
+    "doi": "10.1000/parp-brief",
+    "pmid": "10000003",
+    "pmcid": "PMC1000003",
+    "source_url": "https://example.org/parp-brief",
+    "chunks": [
+      {
+        "section_title": "abstract",
+        "content": "Olaparib is a clinically important PARP inhibitor and a major example of synthetic lethality translated into oncology practice."
+      }
+    ]
+  }
+]

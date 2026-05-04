@@ -1,0 +1,137 @@
+# ChemIntel API
+
+ChemIntel API is an API-first chemistry intelligence backend built with FastAPI and EasyAgent's `EasyLLM`.
+
+It focuses on:
+
+- chemistry entity resolution
+- target and bioactivity intelligence
+- literature RAG with `hybrid + multi_query + rerank`
+- traceable agent runs
+- audit logging
+- async ingestion hooks
+
+## Why this project
+
+This project is designed to show backend engineering depth, not just prompt wiring:
+
+- FastAPI service boundaries
+- SQLAlchemy async data modeling
+- JWT-style auth
+- Celery worker hooks
+- Docker Compose deployment
+- RAG evaluation cases
+- agent step persistence and audit trail
+
+## Core APIs
+
+- `POST /api/v1/auth/login`
+- `POST /api/v1/compounds/resolve`
+- `POST /api/v1/targets/search`
+- `POST /api/v1/bioactivities/search`
+- `POST /api/v1/literature/search`
+- `POST /api/v1/rag/query`
+- `POST /api/v1/agents/{agent_id}/runs`
+- `GET /api/v1/agents/runs/{run_id}`
+- `GET /api/v1/agents/runs/{run_id}/steps`
+- `GET /api/v1/audit-logs`
+
+## RAG strategy
+
+The literature RAG module uses three retrieval profiles:
+
+- `fast`: direct retrieval
+- `balanced`: lexical + dense-overlap hybrid retrieval
+- `high_recall`: multi-query expansion plus reranking
+
+The current seed dataset uses lightweight local retrieval so the project is runnable without a separate vector database during development. The database schema is structured so pgvector-based retrieval can replace it later without changing the API surface.
+
+## Real LLM configuration
+
+LLM access is unified through EasyAgent's `EasyLLM`.
+
+Configure:
+
+- `LLM_PROVIDER`
+- `LLM_MODEL`
+- `LLM_BASE_URL`
+- `LLM_API_KEY`
+
+See `.env.example`.
+
+## Quick start
+
+1. Install dependencies
+
+```bash
+pip install -e ".[dev]"
+```
+
+2. Copy config
+
+```bash
+cp .env.example .env
+```
+
+3. Start infrastructure
+
+```bash
+docker compose up -d postgres redis minio
+```
+
+PostgreSQL is exposed on `localhost:5433` by default to avoid conflicts with an existing local database.
+
+4. Seed demo data
+
+```bash
+python scripts/seed_pubchem.py
+python scripts/seed_chebi.py
+python scripts/seed_chembl.py
+python scripts/seed_pubmed_pmc.py
+```
+
+If you want a lightweight local-only fallback for experiments, set:
+
+```bash
+DATABASE_URL=sqlite+aiosqlite:///./chemintel.db
+```
+
+5. Run API
+
+```bash
+uvicorn app.main:app --reload
+```
+
+6. Run evaluation
+
+```bash
+python scripts/run_eval.py
+```
+
+## Example flow
+
+1. Login with any username.
+2. Call `compound_research_agent` with:
+
+```json
+{
+  "input": "Give me a short research brief on Gefitinib and cite evidence."
+}
+```
+
+3. The backend will:
+
+- resolve the compound
+- load compound profile
+- run literature retrieval
+- generate a grounded report
+- persist run steps and tool invocations
+
+## Data sources modeled in the project
+
+- PubChem
+- ChEBI
+- ChEMBL
+- PubMed / PMC Open Access
+
+The current repository includes curated seed subsets for repeatable local demos, while the integration clients are prepared for live enrichment.

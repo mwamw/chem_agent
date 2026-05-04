@@ -1,0 +1,1 @@
+"""ChemIntel API application package."""
