@@ -53,10 +53,12 @@ class AgentRunService:
         )
         self.session.add(run)
         await self.session.flush()
+        run_id = run.id
+        await self.session.commit()
         context = ToolContext(
             tenant_id=tenant_id,
             user_id=user_id,
-            run_id=run.id,
+            run_id=run_id,
             permissions=permissions or frozenset(),
             services={
                 "compound": self.compounds,
@@ -69,25 +71,29 @@ class AgentRunService:
         try:
             if agent_id == "compound_research_agent":
                 actions, citations, answer = await self._run_compound_agent(
-                    user_input, context, run.id
+                    user_input, context, run_id
                 )
             elif agent_id == "target_intel_agent":
                 actions, citations, answer = await self._run_target_agent(
-                    user_input, context, run.id
+                    user_input, context, run_id
                 )
             else:
                 actions, citations, answer = await self._run_literature_agent(
-                    user_input, context, run.id
+                    user_input, context, run_id
                 )
             run.actions_json = actions
             run.citations_json = citations
             run.final_answer = answer
             run.status = "completed"
-        except Exception:
-            run.status = "failed"
-            run.finished_at = datetime.utcnow()
-            run.latency_ms = int((perf_counter() - started) * 1000)
-            await self.session.flush()
+        except Exception as exc:
+            await self.session.rollback()
+            persisted_run = await self.session.get(AgentRun, run_id)
+            if persisted_run is not None:
+                persisted_run.status = "failed"
+                persisted_run.final_answer = f"Agent run failed: {type(exc).__name__}: {exc}"
+                persisted_run.finished_at = datetime.utcnow()
+                persisted_run.latency_ms = int((perf_counter() - started) * 1000)
+                await self.session.commit()
             raise
         run.finished_at = datetime.utcnow()
         run.latency_ms = int((perf_counter() - started) * 1000)
@@ -96,10 +102,10 @@ class AgentRunService:
             user_id,
             "agent.run",
             "agent_run",
-            run.id,
+            run_id,
             {"agent_id": agent_id, "trace_id": trace_id, "status": run.status},
         )
-        await self.session.flush()
+        await self.session.commit()
         return run
 
     async def _step(
@@ -124,6 +130,7 @@ class AgentRunService:
             )
         )
         await self.session.flush()
+        await self.session.commit()
 
     async def _run_compound_agent(
         self, user_input: str, context: ToolContext, run_id: str

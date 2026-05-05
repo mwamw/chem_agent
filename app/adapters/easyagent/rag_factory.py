@@ -8,8 +8,9 @@ from app.core.config import get_settings
 def build_hybrid_retriever() -> HybridRetriever:
     settings = get_settings()
     llm = None
-    try:
-        llm = build_easyllm()
-    except Exception:
-        llm = None
+    if settings.rag_llm_query_expansion_enabled:
+        try:
+            llm = build_easyllm()
+        except Exception:
+            llm = None
     return HybridRetriever(llm=llm, multi_query_count=settings.rag_multi_query_count)

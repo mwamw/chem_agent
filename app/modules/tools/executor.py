@@ -41,6 +41,8 @@ class ToolExecutor:
             error_message = None
         except Exception as exc:
             latency_ms = int((perf_counter() - started) * 1000)
+            await self.session.rollback()
+            error_message = str(exc) or type(exc).__name__
             invocation = ToolInvocation(
                 tenant_id=context.tenant_id,
                 agent_run_id=context.run_id,
@@ -48,11 +50,16 @@ class ToolExecutor:
                 input_json=validated_payload,
                 output_json={},
                 status="failed",
-                error_message=str(exc),
+                error_message=error_message,
                 latency_ms=latency_ms,
             )
             self.session.add(invocation)
-            await self.session.flush()
+            await self.session.commit()
+            if isinstance(exc, asyncio.TimeoutError):
+                raise HTTPException(
+                    status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+                    detail=f"Tool timed out: {tool.name}",
+                ) from exc
             raise
         latency_ms = int((perf_counter() - started) * 1000)
         invocation = ToolInvocation(
@@ -70,5 +77,5 @@ class ToolExecutor:
             latency_ms=latency_ms,
         )
         self.session.add(invocation)
-        await self.session.flush()
+        await self.session.commit()
         return result

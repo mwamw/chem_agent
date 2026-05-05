@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     rag_multi_query_count: int = 3
     rag_initial_candidate_k: int = 8
     rag_profile: str = "balanced"
+    rag_llm_query_expansion_enabled: bool = False
     allowed_origins: list[str] = Field(default_factory=lambda: ["*"])
 
 

@@ -32,6 +32,7 @@ class LiteratureService:
                         "retrieval_mode": "pgvector_hybrid",
                     }
             except Exception:
+                await self.session.rollback()
                 pass
         fallback = await self._search_local(tenant_id, query, k=k, profile=profile)
         fallback["retrieval_mode"] = "fallback_local"

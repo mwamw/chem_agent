@@ -210,6 +210,12 @@ PaperChunk 全量读取
 
 这个 fallback 适合本地 demo 和故障降级，不适合大规模生产检索。真实测试应优先使用 pgvector 路径，并在结果中确认 `retrieval_mode` 是 `pgvector_hybrid`。
 
+默认情况下，RAG 的 multi-query expansion 使用 deterministic chemistry query expansion，不会在检索阶段调用真实 LLM。真实 LLM 默认只用于最终报告生成，避免 LLM endpoint 慢或不可用时拖垮检索链路。如果你要实验 LLM 参与 query expansion，可以显式设置：
+
+```env
+RAG_LLM_QUERY_EXPANSION_ENABLED=true
+```
+
 ## 推荐的的 RAG 测试集
 
 建议分两类找数据：文献文本数据用于 RAG，结构化化学数据用于工具和业务实体。
@@ -461,4 +467,3 @@ pytest tests/unit tests/eval tests/integration -q
 ```
 
 注意：如果测试依赖 PostgreSQL、pgvector 或 Redis，请先启动 Docker Compose 中的基础设施，并确认 `.env` 指向正确数据库。
-

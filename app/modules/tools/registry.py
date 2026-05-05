@@ -112,13 +112,14 @@ def build_tool_registry() -> ToolRegistry:
         text = await ctx.services["report"].generate_brief(payload["prompt"], payload["context"])
         return ToolResult(status="success", content=text, structured_data={"text": text})
 
-    for name, description, permission_key, input_model, handler in [
+    for name, description, permission_key, input_model, handler, timeout_seconds in [
         (
             "compound.resolve",
             "Resolve a compound from a chemistry query.",
             "tool:compound:resolve",
             CompoundResolveInput,
             compound_resolve,
+            15,
         ),
         (
             "compound.get_profile",
@@ -126,6 +127,7 @@ def build_tool_registry() -> ToolRegistry:
             "tool:compound:get",
             CompoundProfileInput,
             compound_profile,
+            15,
         ),
         (
             "target.search",
@@ -133,6 +135,7 @@ def build_tool_registry() -> ToolRegistry:
             "tool:target:search",
             TargetSearchInput,
             target_search,
+            15,
         ),
         (
             "target.get_profile",
@@ -140,6 +143,7 @@ def build_tool_registry() -> ToolRegistry:
             "tool:target:get",
             TargetProfileInput,
             target_profile,
+            15,
         ),
         (
             "bioactivity.search",
@@ -147,6 +151,7 @@ def build_tool_registry() -> ToolRegistry:
             "tool:bioactivity:search",
             BioactivitySearchInput,
             bioactivity_search,
+            15,
         ),
         (
             "literature.search",
@@ -154,6 +159,7 @@ def build_tool_registry() -> ToolRegistry:
             "tool:literature:search",
             LiteratureSearchInput,
             literature_search,
+            45,
         ),
         (
             "report.generate_brief",
@@ -161,6 +167,7 @@ def build_tool_registry() -> ToolRegistry:
             "tool:report:generate",
             ReportGenerateInput,
             report_generate,
+            45,
         ),
     ]:
         registry.register(
@@ -170,6 +177,7 @@ def build_tool_registry() -> ToolRegistry:
                 permission_key=permission_key,
                 input_model=input_model,
                 handler=handler,
+                timeout_seconds=timeout_seconds,
             )
         )
 

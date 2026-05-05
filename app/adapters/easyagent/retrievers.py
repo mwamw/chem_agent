@@ -39,6 +39,17 @@ STOPWORDS = {
     "with",
 }
 
+QUERY_ALIASES = {
+    "egfr": "epidermal growth factor receptor",
+    "nsclc": "non small cell lung cancer",
+    "parp": "poly adp ribose polymerase",
+    "braf": "b raf proto oncogene serine threonine kinase",
+    "jak": "janus kinase",
+    "gefitinib": "iressa egfr tyrosine kinase inhibitor",
+    "erlotinib": "tarceva egfr tyrosine kinase inhibitor",
+    "imatinib": "gleevec bcr abl tyrosine kinase inhibitor",
+}
+
 
 @dataclass
 class RetrievedChunk:
@@ -206,7 +217,7 @@ class HybridRetriever:
 
     def _expand_queries(self, query: str) -> list[str]:
         if self.llm is None:
-            return [query]
+            return self._deterministic_expand_queries(query)
         prompt = (
             f"Generate {self.multi_query_count} alternative chemistry literature search queries for the user query.\n"
             "Return one query per line with no numbering.\n\n"
@@ -219,7 +230,29 @@ class HybridRetriever:
             ]
             return [query] + generated[: self.multi_query_count]
         except Exception:
-            return [query]
+            return self._deterministic_expand_queries(query)
+
+    def _deterministic_expand_queries(self, query: str) -> list[str]:
+        tokens = [token for token in _tokenize(query) if token not in STOPWORDS]
+        aliases = [QUERY_ALIASES[token] for token in tokens if token in QUERY_ALIASES]
+        compact = " ".join(tokens)
+        candidates = [
+            query,
+            f"{compact} mechanism evidence".strip(),
+            f"{compact} bioactivity target assay".strip(),
+            f"{compact} clinical pharmacology".strip(),
+        ]
+        if aliases:
+            candidates.append(f"{compact} {' '.join(aliases)}".strip())
+        unique: list[str] = []
+        seen: set[str] = set()
+        for candidate in candidates:
+            normalized = " ".join(candidate.split())
+            key = normalized.lower()
+            if normalized and key not in seen:
+                seen.add(key)
+                unique.append(normalized[:500])
+        return unique[: max(self.multi_query_count + 1, 1)]
 
     def _rerank(
         self, query: str, candidates: list[RetrievedChunk], top_k: int
